@@ -2,14 +2,15 @@ from rest_framework import permissions
 
 
 class UpdateOwnProfile(permissions.BasePermission):
-    """Allows users to edit their own profile"""
+    """Require authentication and restrict profile changes to the profile owner."""
+
+    def has_permission(self, request, view):
+        """Only authenticated users may access profile endpoints."""
+        return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        """Check user is to trying to edit their own profile"""
-
-        #check if method is get i.e user only want to view
+        """Allow safe reads; only the owner may modify a profile."""
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        #if method is not get then will check if user wants to edit own profile
-        return obj.id == request.user.ids
+        return obj.id == request.user.id
