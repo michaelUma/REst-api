@@ -16,12 +16,24 @@ class UserProfileSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        #data is passed to validated_data as a dictionary
-        """Create and return new user"""
-
-        user = models.UserProfile(email=validated_data['email'],
-                                  name=validated_data['name'])
+        """Create and return a new user with a hashed password."""
+        user = models.UserProfile(
+            email=validated_data['email'],
+            name=validated_data['name']
+        )
         user.set_password(validated_data['password'])
         user.save()
-
         return user
+
+    def update(self, instance, validated_data):
+        """Update profile fields and hash a new password when supplied."""
+        password = validated_data.pop('password', None)
+        instance = super(UserProfileSerializer, self).update(
+            instance, validated_data
+        )
+
+        if password:
+            instance.set_password(password)
+            instance.save(update_fields=['password'])
+
+        return instance

@@ -1,53 +1,69 @@
-# DJANGO REST API
+# Django REST API
 
-It includes rest api's to handle functionality for managing profiles.
+A Django REST Framework API for user profile management and authentication.
 
-## Installation (Mac and Linux)
+## Requirements
 
-Clone the repo and then run the following commands
+- Python 3.8
+- The packages listed in `requirements.txt`
 
-- Create a virtual environment
+## Installation
+
+### macOS / Linux
+
 ```bash
-python3 -m venv ./venv
-```
-- Activate virtual environment
-```bash
-source ./venv/bin/activate
-```
-- Install all the required packages
-```bash
-pip3 install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-## Installation (Windows)
+### Windows PowerShell
 
-Clone the repo and then run the following commands
-
-- Create a virtual environment
-```bash
-python -m venv ./venv
-```
-- Activate virtual environment
-```bash
-venv/Script/activate
-```
-- Install all the required packages
-```bash
-pip install -r requirements.txt
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
+## Configure environment variables
 
-## Usage
+The Django secret key is intentionally not stored in this repository. Set a unique key in each environment.
 
-- Mac and Linux
+### macOS / Linux
+
 ```bash
-python3 manage.py runserver
+export DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(50))')"
+export DJANGO_DEBUG=True
+export DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
-- Windows
+### Windows PowerShell
+
+```powershell
+$env:DJANGO_SECRET_KEY = python -c "import secrets; print(secrets.token_urlsafe(50))"
+$env:DJANGO_DEBUG = "True"
+$env:DJANGO_ALLOWED_HOSTS = "localhost,127.0.0.1"
+```
+
+Do not commit real secret keys or local `.env` files. For production, set `DJANGO_DEBUG=False` and configure `DJANGO_ALLOWED_HOSTS` with the exact hostnames serving the application.
+
+## Run the application
+
+Apply migrations first:
+
 ```bash
+python manage.py migrate
 python manage.py runserver
 ```
 
+## Run regression tests
+
+```bash
+python manage.py test profiles_api
+```
+
+The profile API regression tests cover authentication, profile list/detail privacy, owner-only updates, and password hashing. GitHub Actions runs this test command for pull requests and pushes to the main development branch.
+
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Pull requests are welcome. For major changes, open an issue first to discuss the proposed change.

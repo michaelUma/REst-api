@@ -110,7 +110,7 @@ class HelloViewSet(viewsets.ViewSet):
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
-    """Handles creating, reading & updating profiles"""
+    """Handles creating, reading & updating the authenticated user's profile"""
 
     serializer_class = serializers.UserProfileSerializer
     queryset = models.UserProfile.objects.all()
@@ -118,6 +118,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.UpdateOwnProfile,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'email',)
+
+    def get_queryset(self):
+        """Prevent profile list and detail endpoints from exposing other users."""
+        return models.UserProfile.objects.filter(pk=self.request.user.pk)
 
 
 class LoginViewset(viewsets.ViewSet):

@@ -1,0 +1,35 @@
+name: Django regression tests
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # Django 2.2.13 is pinned to a legacy-compatible Python runtime.
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run profile API regression tests
+        run: python manage.py test profiles_api
+        env:
+          DJANGO_SECRET_KEY: "ci-test-only-not-a-production-secret"
+          DJANGO_DEBUG: "False"
+          DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,testserver"
